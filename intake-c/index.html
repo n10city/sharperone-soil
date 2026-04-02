@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>The Sharper ONE™ — Welcome</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple:      #3C2469;
+    --purple-mid:  #5a3a8e;
+    --purple-light:#7c5ab8;
+    --orange:      #ff5500;
+    --orange-dim:  #cc4400;
+    --ink:         #1a1018;
+    --ink-mid:     #3d2e4a;
+    --muted:       #8a7a96;
+    --surface:     #f5f0e8;
+    --font-display:'Bebas Neue', sans-serif;
+    --font-ui:     'Barlow Condensed', sans-serif;
+    --font-body:   'Barlow', sans-serif;
+    --session-color: #f5f0e8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: var(--font-body); background: var(--surface); color: var(--ink); overflow: hidden; }
+
+  /* ── NAV ── */
+  .nav {
+    background: var(--purple); height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem; flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav-orb {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+  }
+  .nav-name { font-family: var(--font-ui); font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: white; }
+  .nav-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--session-color); box-shadow: 0 0 6px var(--session-color); transition: background 0.4s, box-shadow 0.4s; }
+
+  .progress-bar { height: 3px; background: rgba(60,36,105,0.08); flex-shrink: 0; }
+  .progress-fill { height: 100%; background: var(--orange); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+
+  .intake-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+  /* ── SHELL ── */
+  #shell { position: fixed; inset: 0; display: flex; flex-direction: column; }
+
+  /* ── LOADING STATE ── */
+  #loadingScreen {
+    position: fixed; inset: 0;
+    background: var(--purple);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; z-index: 200;
+    transition: opacity 0.5s ease;
+  }
+  #loadingScreen.gone { opacity: 0; pointer-events: none; }
+  .load-orb {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    animation: orbPulse 1.5s ease infinite;
+  }
+  @keyframes orbPulse {
+    0%,100%{ box-shadow: 0 0 0 8px rgba(255,85,0,0.15), 0 0 0 16px rgba(255,85,0,0.07); }
+    50%    { box-shadow: 0 0 0 14px rgba(255,85,0,0.1), 0 0 0 28px rgba(255,85,0,0.03); }
+  }
+  .load-text { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+  /* ── ERROR STATE ── */
+  #errorScreen {
+    position: fixed; inset: 0; background: var(--purple);
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem; text-align: center; z-index: 200;
+  }
+  .error-title { font-family: var(--font-display); font-size: 2.5rem; color: white; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+  .error-sub { font-family: var(--font-body); font-size: 0.9rem; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+  /* ── STAGES ── */
+  .stage { min-height: 100%; display: none; flex-direction: column; padding: 2rem 1.5rem 3rem; animation: stageIn 0.4s ease forwards; }
+  .stage.active { display: flex; }
+  @keyframes stageIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  .eyebrow { font-family: var(--font-ui); font-size: 10px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.4rem; text-align: center; }
+  .stage-title { font-family: var(--font-display); font-size: clamp(2rem, 8vw, 3rem); color: var(--purple); letter-spacing: 0.04em; line-height: 1; text-align: center; margin-bottom: 0.5rem; }
+  .stage-sub { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); text-align: center; line-height: 1.5; margin-bottom: 2rem; }
+
+  /* Card echo */
+  .card-echo {
+    width: 100%; max-width: 340px; height: 100px; border-radius: 12px;
+    background: var(--session-color); margin: 0 auto 1.8rem;
+    position: relative; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.4s; flex-shrink: 0;
+  }
+  .card-echo-label {
+    background: linear-gradient(135deg,#fff 0%,#f8f8f8 100%);
+    border: 1px solid rgba(0,0,0,0.1); border-radius: 2px;
+    padding: 0 14px; height: 36px;
+    display: flex; align-items: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08); position: relative; z-index: 2;
+  }
+  .card-echo-name { font-family: var(--font-ui); font-size: 18px; font-weight: 800; letter-spacing: 0.14em; color: var(--ink); text-transform: uppercase; }
+  .card-echo-ghost { position: absolute; right:-8px; bottom:-16px; font-family: var(--font-display); font-size: 72px; color: rgba(60,36,105,0.06); pointer-events: none; user-select: none; }
+  .card-echo-dot { position: absolute; top:10px; right:12px; width:8px; height:8px; border-radius:50%; background:var(--orange); opacity:0.5; }
+
+  /* Blade photo (operator-taken — the reveal moment) */
+  .blade-photo-reveal {
+    width: 100%; max-width: 340px; margin: 0 auto 1.8rem;
+    border-radius: 12px; overflow: hidden;
+    background: var(--ink); aspect-ratio: 4/3;
+    display: none; position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .blade-photo-reveal.visible { display: block; }
+  .blade-photo-reveal img { width:100%; height:100%; object-fit:cover; }
+  .blade-photo-label {
+    position: absolute; bottom:10px; left:12px;
+    font-family: var(--font-ui); font-size: 9px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    background: rgba(26,16,24,0.75); color: rgba(255,255,255,0.8);
+    padding: 3px 8px; border-radius: 2px;
+  }
+
+  /* Info chips */
+  .info-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
+  .info-chip {
+    background: white; border: 1px solid rgba(60,36,105,0.12);
+    border-radius: 20px; padding: 6px 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .chip-dot { width:8px; height:8px; border-radius:50%; background:var(--session-color); border:1px solid rgba(60,36,105,0.15); transition:background 0.4s; flex-shrink:0; }
+  .chip-label { font-family:var(--font-ui); font-size:9px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); }
+  .chip-val   { font-family:var(--font-ui); font-size:13px; font-weight:700; letter-spacing:0.06em; color:var(--purple); }
+
+  /* Field input */
+  .field-block { max-width:380px; margin:0 auto 1.5rem; width:100%; }
+  .field-label { font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:block; }
+  .field-input {
+    width:100%; font-family:var(--font-ui); font-size:28px; font-weight:700;
+    letter-spacing:0.06em; color:var(--purple); background:white;
+    border:2px solid rgba(60,36,105,0.15); border-radius:8px;
+    padding:16px 20px; outline:none; -webkit-appearance:none;
+    transition:border-color 0.2s;
+  }
+  .field-input:focus { border-color:var(--orange); }
+  .field-input::placeholder { color:rgba(60,36,105,0.2); font-weight:400; }
+
+  /* Blade chips */
+  .blade-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:380px; margin:0 auto 1.5rem; width:100%; }
+  .blade-chip {
+    background:white; border:2px solid rgba(60,36,105,0.12);
+    border-radius:10px; padding:14px 12px; cursor:pointer;
+    transition:all 0.15s; display:flex; flex-direction:column; gap:4px;
+  }
+  .blade-chip:hover  { border-color:var(--purple-light); }
+  .blade-chip.selected { border-color:var(--orange); background:rgba(255,85,0,0.04); }
+  .blade-chip-icon { font-size:20px; line-height:1; }
+  .blade-chip-name { font-family:var(--font-ui); font-size:13px; font-weight:700; letter-spacing:0.06em; color:var(--ink); }
+  .blade-chip-sub  { font-family:var(--font-body); font-size:11px; color:var(--muted); line-height:1.3; }
+
+  /* Consent */
+  .consent-stack { max-width:380px; width:100%; margin:0 auto 1.5rem; display:flex; flex-direction:column; gap:10px; }
+  .consent-opt {
+    background:white; border:2px solid rgba(60,36,105,0.12);
+    border-radius:10px; padding:14px 16px; cursor:pointer;
+    transition:all 0.15s; display:flex; align-items:center; gap:14px;
+    outline:none;
+  }
+  .consent-opt:hover  { border-color:var(--purple-light); }
+  .consent-opt.selected { border-color:var(--orange); background:rgba(255,85,0,0.03); }
+  .consent-indicator {
+    width:20px; height:20px; border-radius:50%;
+    border:2px solid rgba(60,36,105,0.2); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+  }
+  .consent-opt.selected .consent-indicator { background:var(--orange); border-color:var(--orange); }
+  .consent-opt.selected .consent-indicator::after { content:''; width:6px; height:6px; border-radius:50%; background:white; }
+  .consent-opt-title { font-family:var(--font-ui); font-size:14px; font-weight:700; letter-spacing:0.06em; color:var(--ink); margin-bottom:2px; }
+  .consent-opt-sub   { font-family:var(--font-body); font-size:12px; color:var(--muted); line-height:1.4; }
+
+  /* Quote block */
+  .quote-block {
+    max-width:380px; width:100%; margin:0 auto 1.5rem;
+    background:var(--purple); border-radius:12px; padding:20px 22px; position:relative; overflow:hidden;
+  }
+  .quote-mark { position:absolute; top:-10px; left:14px; font-family:var(--font-display); font-size:80px; color:rgba(255,255,255,0.06); pointer-events:none; }
+  .quote-text { font-family:var(--font-body); font-style:italic; font-size:0.95rem; color:rgba(255,255,255,0.85); line-height:1.6; position:relative; z-index:1; margin-bottom:10px; }
+  .quote-source { font-family:var(--font-ui); font-size:9px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,85,0,0.7); }
+
+  /* Confirm card */
+  .confirm-card {
+    max-width:380px; width:100%; margin:0 auto 1.5rem;
+    background:var(--session-color); border-radius:16px;
+    padding:24px 20px; position:relative; overflow:hidden;
+    box-shadow:0 4px 24px rgba(0,0,0,0.08); transition:background 0.4s;
+  }
+  .confirm-ghost { position:absolute; right:-12px; bottom:-20px; font-family:var(--font-display); font-size:100px; color:rgba(60,36,105,0.07); pointer-events:none; user-select:none; }
+  .confirm-name { font-family:var(--font-display); font-size:2.2rem; color:var(--purple); letter-spacing:0.06em; margin-bottom:16px; position:relative; z-index:1; }
+  .confirm-rows { display:flex; flex-direction:column; gap:10px; position:relative; z-index:1; }
+  .confirm-row { display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid rgba(60,36,105,0.1); padding-bottom:8px; }
+  .confirm-row:last-child { border-bottom:none; padding-bottom:0; }
+  .confirm-key { font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); }
+  .confirm-val { font-family:var(--font-ui); font-size:15px; font-weight:700; letter-spacing:0.06em; color:var(--purple); text-align:right; }
+  .confirm-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--session-color); border:1px solid rgba(60,36,105,0.2); margin-left:6px; vertical-align:middle; transition:background 0.4s; }
+
+  /* Done orb */
+  .done-orb {
+    width:80px; height:80px; border-radius:50%;
+    margin:0 auto 1.5rem; display:flex; align-items:center; justify-content:center;
+    animation:orbPulse2 2s ease infinite;
+  }
+  @keyframes orbPulse2 {
+    0%,100%{ box-shadow:0 0 0 12px rgba(255,85,0,0.12),0 0 0 24px rgba(255,85,0,0.06); }
+    50%    { box-shadow:0 0 0 16px rgba(255,85,0,0.08),0 0 0 32px rgba(255,85,0,0.03); }
+  }
+
+  /* CTA */
+  .cta { max-width:380px; width:100%; margin:0 auto; display:block; font-family:var(--font-ui); font-size:14px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; padding:18px; background:var(--orange); color:white; border:none; border-radius:8px; cursor:pointer; transition:background 0.15s,transform 0.15s; text-align:center; }
+  .cta:hover { background:var(--orange-dim); transform:translateY(-1px); }
+  .cta.secondary { background:white; color:var(--purple); border:2px solid rgba(60,36,105,0.15); margin-top:10px; }
+  .cta.secondary:hover { border-color:var(--purple); background:white; transform:none; }
+  .stage-divider { height:1px; background:rgba(60,36,105,0.1); max-width:380px; margin:1.5rem auto; width:100%; }
+
+  /* ── LANDSCAPE: Stage 4 stays usable ── */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .stage { padding: 1rem 1.5rem 2rem; }
+    .stage-title { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .stage-sub { margin-bottom: 1rem; }
+    .phone-field { margin-bottom: 0.75rem !important; }
+    #emailField { margin-top: 0.75rem !important; }
+    .consent-stack { gap: 6px; margin-bottom: 1rem; }
+    .consent-opt { padding: 10px 14px; }
+    .quote-block { padding: 14px 18px; margin-bottom: 1rem; }
+    .cta { padding: 14px; }
+    .stage-divider { margin: 1rem auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loadingScreen">
+  <div class="load-orb"><img src="/icons/orb-logo.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></div>
+  <p class="load-text">Preparing your session…</p>
+</div>
+
+<!-- ERROR -->
+<div id="errorScreen">
+  <h1 class="error-title">SESSION<br>NOT FOUND.</h1>
+  <p class="error-sub">This session may have expired or the link is incorrect.<br>See the operator for a new QR code.</p>
+</div>
+
+<!-- MAIN SHELL -->
+<div id="shell" style="display:none;">
+  <div class="nav">
+    <div class="nav-brand">
+      <img src="/icons/Sharper-ONE_Logo-Symbol_app-icon_trans.png" alt="The Sharper ONE™" class="nav-orb" width="30" height="30">
+      <span class="nav-name">The Sharper ONE<span style="font-size:0.6em;vertical-align:super;font-family:var(--font-ui);font-weight:800;">™</span></span>
+    </div>
+    <div class="nav-dot" id="navDot"></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="intake-scroll" id="intakeScroll">
+
+    <!-- ── STAGE 1: MIRROR ── -->
+    <div class="stage active" id="stage1">
+      <p class="eyebrow">Welcome</p>
+      <h2 class="stage-title">YOUR EDGE<br>AWAITS.</h2>
+      <p class="stage-sub">Here's what we have so far.</p>
+
+      <div class="card-echo" id="cardEcho">
+        <div class="card-echo-label"><span class="card-echo-name" id="echoName">—</span></div>
+        <div class="card-echo-ghost">1</div>
+        <div class="card-echo-dot"></div>
+      </div>
+
+      <!-- Blade photo reveal — the gasp moment -->
+      <div class="blade-photo-reveal" id="bladePhotoReveal">
+        <img id="bladePhotoImg" src="" alt="Your blade">
+        <span class="blade-photo-label">Before</span>
+      </div>
+
+      <div class="info-row">
+        <div class="info-chip"><div class="chip-dot"></div><span class="chip-label">Date</span><span class="chip-val" id="chipDate">—</span></div>
+        <div class="info-chip"><div class="chip-dot"></div><span class="chip-label">Location</span><span class="chip-val">Front of the Farm</span></div>
+        <div class="info-chip"><div class="chip-dot"></div><span class="chip-label">Blades</span><span class="chip-val" id="chipCount">—</span></div>
+      </div>
+
+      <button class="cta" onclick="nextStage(2)">That's Me — Let's Go →</button>
+    </div>
+
+    <!-- ── STAGE 2: LAST NAME ── -->
+    <div class="stage" id="stage2">
+      <p class="eyebrow">One More Thing</p>
+      <h2 class="stage-title">LAST<br>NAME.</h2>
+      <p class="stage-sub">So we can greet you right — every time.</p>
+      <div class="field-block">
+        <label class="field-label" for="lastNameInput">Last Name</label>
+        <input class="field-input" id="lastNameInput" type="text" placeholder="—"
+          autocomplete="off" autocorrect="off" spellcheck="false"
+          autocapitalize="words" inputmode="text" oninput="S.lastName=this.value.trim()">
+      </div>
+      <button class="cta" onclick="nextStage(3)">Continue →</button>
+      <button class="cta secondary" onclick="nextStage(3)">Skip</button>
+    </div>
+
+    <!-- ── STAGE 3: BLADE TYPES ── -->
+    <div class="stage" id="stage3">
+      <p class="eyebrow">What We're Working With</p>
+      <h2 class="stage-title">THE<br>BLADE.</h2>
+      <p class="stage-sub">Tap all that apply.</p>
+      <div class="blade-grid">
+        <div class="blade-chip" onclick="toggleBlade(this,'Kitchen Knife')">
+          <span class="blade-chip-icon">🔪</span>
+          <span class="blade-chip-name">Kitchen Knife</span>
+          <span class="blade-chip-sub">Chef's, paring, bread</span>
+        </div>
+        <div class="blade-chip" onclick="toggleBlade(this,'Straight Razor')">
+          <span class="blade-chip-icon">💈</span>
+          <span class="blade-chip-name">Straight Razor</span>
+          <span class="blade-chip-sub">Barber / shave-ready</span>
+        </div>
+        <div class="blade-chip" onclick="toggleBlade(this,'Pocket Knife')">
+          <span class="blade-chip-icon">🗡️</span>
+          <span class="blade-chip-name">Pocket Knife</span>
+          <span class="blade-chip-sub">EDC, folder, fixed</span>
+        </div>
+        <div class="blade-chip" onclick="toggleBlade(this,'Field Blade')">
+          <span class="blade-chip-icon">🏕️</span>
+          <span class="blade-chip-name">Field Blade</span>
+          <span class="blade-chip-sub">Camp, hunt, survival</span>
+        </div>
+        <div class="blade-chip" onclick="toggleBlade(this,'Garden / Landscape')">
+          <span class="blade-chip-icon">✂️</span>
+          <span class="blade-chip-name">Garden / Landscape</span>
+          <span class="blade-chip-sub">Shears, pruners, mower</span>
+        </div>
+        <div class="blade-chip" onclick="toggleBlade(this,'Other Tool')">
+          <span class="blade-chip-icon">🔧</span>
+          <span class="blade-chip-name">Other Tool</span>
+          <span class="blade-chip-sub">Axe, chisel, specialty</span>
+        </div>
+      </div>
+      <button class="cta" onclick="nextStage(4)">Continue →</button>
+      <button class="cta secondary" onclick="nextStage(4)">Skip</button>
+    </div>
+
+    <!-- ── STAGE 4: CONSENT ── -->
+    <div class="stage" id="stage4">
+      <p class="eyebrow">Stay Connected</p>
+      <h2 class="stage-title">HOW WE<br>REACH YOU.</h2>
+      <p class="stage-sub">When it's ready — how do you want to know?</p>
+      <div class="phone-field" style="display:block;margin-bottom:1.25rem;">
+        <label style="display:block;font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;">Your Phone Number</label>
+        <div style="position:relative;">
+          <input
+            type="tel"
+            id="phoneInput"
+            placeholder="(817) 555-0100"
+            inputmode="tel"
+            maxlength="14"
+            oninput="formatPhone(this); showPhoneEdit(false);"
+            onfocus="showPhoneEdit(false);"
+            style="width:100%;padding:0.85rem 3.5rem 0.85rem 1rem;background:white;border:2px solid rgba(60,36,105,0.15);border-radius:8px;color:var(--purple);font-family:var(--font-ui);font-size:20px;font-weight:700;letter-spacing:0.08em;outline:none;transition:border-color 0.2s;"
+            onblur="onPhoneBlur();"
+          >
+          <div id="phoneVerify" style="display:none;position:absolute;inset:0;background:white;border:2px solid var(--orange);border-radius:8px;padding:0 1rem;align-items:center;justify-content:space-between;gap:8px;">
+            <span id="phoneVerifyVal" style="font-family:var(--font-ui);font-size:20px;font-weight:700;letter-spacing:0.08em;color:var(--purple);"></span>
+            <button type="button" onclick="editPhone()" style="flex-shrink:0;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);background:none;border:none;padding:4px 8px;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <p style="font-family:var(--font-ui);font-size:11px;color:var(--muted);margin-top:0.4rem;letter-spacing:0.06em;">Required for Text notifications. Used only for pickup alerts.</p>
+      </div>
+      <div class="consent-stack">
+        <div class="consent-opt selected" id="cText" onclick="selectConsent('text')">
+          <div class="consent-indicator"></div>
+          <div><div class="consent-opt-title">Text me when it's ready</div><div class="consent-opt-sub">Quick pickup notification. No spam.</div></div>
+        </div>
+        <div class="consent-opt" id="cEmail" onclick="selectConsent('email')">
+          <div class="consent-indicator"></div>
+          <div><div class="consent-opt-title">Email me too</div><div class="consent-opt-sub">Edge tips, session schedules, member news.</div></div>
+        </div>
+        <div class="consent-opt" id="cNone" onclick="selectConsent('none')">
+          <div class="consent-indicator"></div>
+          <div><div class="consent-opt-title">I'll check back</div><div class="consent-opt-sub">No notifications needed.</div></div>
+        </div>
+      </div>
+      <div class="stage-divider"></div>
+      <div class="quote-block">
+        <div class="quote-mark">"</div>
+        <p class="quote-text" id="quoteText">Every LiFE™ has a ONE™ — that occasional or often needed edge that, when sharp, makes everything flow.</p>
+        <p class="quote-source">The Sharper ONE™ · Edge. Restored.</p>
+      </div>
+  
+      <!-- Email capture — shown when "Email me too" is selected -->
+      <div id="emailField" style="display:none;margin-top:1.25rem;">
+        <label style="display:block;font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;">Your Email Address</label>
+        <div style="position:relative;">
+          <input
+            type="email"
+            id="emailInput"
+            placeholder="you@example.com"
+            inputmode="email"
+            autocomplete="email"
+            oninput="S.email = this.value.trim(); showEmailEdit(false);"
+            style="width:100%;padding:0.85rem 3.5rem 0.85rem 1rem;background:white;border:2px solid rgba(60,36,105,0.15);border-radius:8px;color:var(--purple);font-family:var(--font-ui);font-size:16px;font-weight:600;letter-spacing:0.02em;outline:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='var(--orange)'"
+            onblur="if(this.value.trim()) { this.style.borderColor='rgba(60,36,105,0.15)'; onEmailBlur(); } else { this.style.borderColor='rgba(60,36,105,0.15)'; }"
+          >
+          <div id="emailVerify" style="display:none;position:absolute;inset:0;background:white;border:2px solid var(--orange);border-radius:8px;padding:0 1rem;align-items:center;justify-content:space-between;gap:8px;overflow:hidden;">
+            <span id="emailVerifyVal" style="font-family:var(--font-ui);font-size:14px;font-weight:600;letter-spacing:0.02em;color:var(--purple);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
+            <button type="button" onclick="editEmail()" style="flex-shrink:0;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);background:none;border:none;padding:4px 8px;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <p style="font-family:var(--font-ui);font-size:11px;color:var(--muted);margin-top:0.4rem;letter-spacing:0.06em;">Edge tips, session schedules, and member news. No junk.</p>
+      </div>
+    <button class="cta" onclick="completeIntake()" style="margin-top:1.5rem;">Complete →</button>
+    </div>
+
+    <!-- ── STAGE 5: CONFIRMATION ── -->
+    <div class="stage" id="stage5">
+      <div class="done-orb"><img src="/icons/orb-logo.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></div>
+      <p class="eyebrow">You're In</p>
+      <h2 class="stage-title">EDGE IN<br>PROGRESS.</h2>
+      <p class="stage-sub" style="margin-bottom:1.5rem;">Here's your session.</p>
+
+      <div class="confirm-card" id="confirmCard">
+        <div class="confirm-ghost">1</div>
+        <div class="confirm-name" id="confirmName">—</div>
+        <div class="confirm-rows">
+          <div class="confirm-row"><span class="confirm-key">Date</span><span class="confirm-val" id="cDate">—</span></div>
+          <div class="confirm-row"><span class="confirm-key">Location</span><span class="confirm-val">Front of the Farm</span></div>
+          <div class="confirm-row"><span class="confirm-key">Blades</span><span class="confirm-val" id="cCount">—</span></div>
+          <div class="confirm-row"><span class="confirm-key">Types</span><span class="confirm-val" id="cTypes">—</span></div>
+          <div class="confirm-row"><span class="confirm-key">Notification</span><span class="confirm-val" id="cConsent">Text</span></div>
+          <div class="confirm-row">
+            <span class="confirm-key">Card</span>
+            <span class="confirm-val" id="cColor">—<span class="confirm-swatch" id="cSwatch"></span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-divider"></div>
+      <div class="quote-block">
+        <div class="quote-mark">"</div>
+        <p class="quote-text" id="confirmQuote">Sharpening is not what we do. SiMPLE™ is what we do. The edge just happens to be where it starts.</p>
+        <p class="quote-source">The Sharper ONE™ · sharper.one</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const QUOTES = [
+    "Every LiFE™ has a ONE™ — that occasional or often needed edge that, when sharp, makes everything flow.",
+    "Sharpening is not what we do. SiMPLE™ is what we do. The edge just happens to be where it starts.",
+    "The Sharper ONE™ is a simple intervention with an unreasonably large return.",
+    "We are not in the sharpening business. We are in the LiFE™ business.",
+    "Every art has an edge. Every kraft has a blade. Every life has a ONE™.",
+    "When it's sharp, everything flows. When it's dull, everything drags."
+  ];
+
+  const PROGRESS = {1:10,2:30,3:52,4:74,5:100};
+
+  const S = {
+    token: null, firstName:'', lastInitial:'',
+    bladeCount:0, cardColor:null, cardColorName:null,
+    date:'', photo:null, lastName:'', bladeTypes:[], consent:'text'
+  };
+
+  // ── BOOT: read token from URL ──
+  window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('s');
+
+    if (!token || !token.startsWith('ses_')) {
+      showError(); return;
+    }
+
+    try {
+      const res  = await fetch('/intake/session_read.php?s=' + encodeURIComponent(token));
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      bootSession(data);
+    } catch(e) {
+      showError();
+    }
+  });
+
+  function bootSession(data) {
+    S.token         = data.token;
+    S.firstName     = data.firstName;
+    S.lastInitial   = data.lastInitial;
+    S.bladeCount    = data.bladeCount;
+    S.cardColor     = data.cardColor;
+    S.cardColorName = data.cardColorName;
+    S.date          = data.date;
+    S.photo         = data.photo;
+
+    // Apply session color everywhere
+    applyColor(S.cardColor);
+
+    // Populate Stage 1
+    document.getElementById('echoName').textContent = S.firstName + ' ' + S.lastInitial + '.';
+    document.getElementById('chipDate').textContent  = S.date;
+    document.getElementById('chipCount').textContent = S.bladeCount + (S.bladeCount===1?' blade':' blades');
+
+    // Blade photo reveal — the moment
+    if (S.photo) {
+      const frame = document.getElementById('bladePhotoReveal');
+      const img   = document.getElementById('bladePhotoImg');
+      img.src = S.photo;
+      frame.classList.add('visible');
+    }
+
+    // Quotes
+    const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    document.getElementById('quoteText').textContent   = q;
+    document.getElementById('confirmQuote').textContent = QUOTES[(QUOTES.indexOf(q)+1)%QUOTES.length];
+
+    // Show shell
+    document.getElementById('loadingScreen').classList.add('gone');
+    document.getElementById('shell').style.display = 'flex';
+    document.getElementById('shell').style.flexDirection = 'column';
+    updateProgress(1);
+  }
+
+  function applyColor(color) {
+    document.documentElement.style.setProperty('--session-color', color);
+    document.getElementById('navDot').style.background  = color;
+    document.getElementById('navDot').style.boxShadow   = `0 0 6px ${color}`;
+    document.getElementById('cardEcho').style.background = color;
+    document.getElementById('confirmCard').style.background = color;
+    document.getElementById('cSwatch').style.background = color;
+    document.querySelectorAll('.chip-dot').forEach(d => d.style.background = color);
+  }
+
+  function showError() {
+    document.getElementById('loadingScreen').classList.add('gone');
+    document.getElementById('errorScreen').style.display = 'flex';
+  }
+
+  // ── STAGE NAVIGATION ──
+  function nextStage(n) {
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+    document.getElementById('stage'+n).classList.add('active');
+    updateProgress(n);
+    document.getElementById('intakeScroll').scrollTo({top:0,behavior:'smooth'});
+
+    if (n === 5) buildConfirm();
+    if (n === 4) {
+      setTimeout(() => document.getElementById('phoneInput')?.focus(), 150);
+    }
+  }
+
+  function updateProgress(n) {
+    document.getElementById('progressFill').style.width = PROGRESS[n] + '%';
+  }
+
+  // ── BLADE CHIPS ──
+  function toggleBlade(chip, type) {
+    chip.classList.toggle('selected');
+    if (chip.classList.contains('selected')) S.bladeTypes.push(type);
+    else S.bladeTypes = S.bladeTypes.filter(t => t !== type);
+  }
+
+  // ── CONSENT ──
+  function selectConsent(type) {
+    S.consent = type;
+    ['cText','cEmail','cNone'].forEach(id => document.getElementById(id).classList.remove('selected'));
+    const map = {text:['cText'], email:['cEmail','cText'], none:['cNone']};
+    map[type].forEach(id => document.getElementById(id).classList.add('selected'));
+    // Show email field when "Email me too" is selected
+    const emailField = document.getElementById('emailField');
+    if (emailField) {
+      emailField.style.display = type === 'email' ? 'block' : 'none';
+      if (type !== 'email') { S.email = ''; const ei = document.getElementById('emailInput'); if (ei) ei.value = ''; showEmailEdit(false); }
+      if (type === 'email') {
+        setTimeout(() => {
+          const ei = document.getElementById('emailInput');
+          if (ei) { ei.scrollIntoView({ behavior:'smooth', block:'center' }); ei.focus(); }
+        }, 100);
+      }
+    }
+  }
+
+  // ── PHONE FORMAT ──
+  function formatPhone(input) {
+    const pos = input.selectionStart;
+    const prev = input.value;
+    let digits = prev.replace(/\D/g,'').substring(0,10);
+    let formatted = digits;
+    if (digits.length >= 6)
+      formatted = '('+digits.substring(0,3)+') '+digits.substring(3,6)+'-'+digits.substring(6);
+    else if (digits.length >= 3)
+      formatted = '('+digits.substring(0,3)+') '+digits.substring(3);
+    if (formatted !== prev) {
+      input.value = formatted;
+      const added = formatted.length - prev.length;
+      try { input.setSelectionRange(pos+added, pos+added); } catch(e) {}
+    }
+    S.phone = digits;
+  }
+
+  // ── COMPLETE + POST ──
+  async function completeIntake() {
+    const phoneEl = document.getElementById('phoneInput');
+    if (phoneEl && phoneEl.value.trim()) S.phone = phoneEl.value.trim();
+    // S.phone already set by formatPhone() — this only updates if field is visible and has value
+    const emailEl = document.getElementById('emailInput');
+    if (emailEl && S.consent === 'email') S.email = emailEl.value.trim();
+
+    // Non-negotiable gate — service cannot proceed without these three
+    if (!S.firstName || S.firstName.trim().length < 1) return;
+    if (!S.lastName  || S.lastName.trim().length  < 1) return;
+    if (!S.phone || S.phone.replace(/\D/g,'').length < 10) {
+      if (phoneEl) {
+        phoneEl.style.borderColor = 'var(--orange)';
+        phoneEl.focus();
+        let tip = document.getElementById('phoneTip');
+        if (!tip) {
+          tip = document.createElement('p');
+          tip.id = 'phoneTip';
+          tip.style = 'font-family:var(--font-ui);font-size:11px;color:var(--orange);margin-top:0.4rem;letter-spacing:0.06em;';
+          tip.textContent = 'Phone number required for pickup notification.';
+          phoneEl.closest('div').after(tip);
+        }
+        phoneEl.addEventListener('input', () => tip.remove(), {once:true});
+      }
+      return;
+    }
+    // Email gate — required when consent is email
+    if (S.consent === 'email') {
+      const _ep = S.email ? S.email.split('@') : [];
+      const _tld = _ep[1] ? _ep[1].split('.').pop() : '';
+      const _emailOk = _ep.length === 2 && _ep[0].length >= 1 && _tld.length >= 2;
+      if (!_emailOk) {
+        showEmailEdit(false);
+        if (emailEl) {
+          emailEl.style.borderColor = 'var(--orange)';
+          emailEl.scrollIntoView({ behavior:'smooth', block:'center' });
+          emailEl.focus();
+        }
+        return;
+      }
+    }
+
+    // All gates passed — advance stage, then POST
+    nextStage(5);
+    try {
+      await fetch('/intake/session_update.php', {
+        method:  'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          token:      S.token,
+          lastName:   S.lastName,
+          bladeTypes: S.bladeTypes,
+          consent:    S.consent,
+          phone:      S.phone || '',
+          email:      S.email || '',
+        }),
+      });
+    } catch(e) { /* silent — completion data is best-effort */ }
+  }
+
+  // ── BUILD CONFIRM SCREEN ──
+  function buildConfirm() {
+    const fullName = S.lastName
+      ? S.firstName + ' ' + S.lastName.toUpperCase()
+      : S.firstName + ' ' + S.lastInitial + '.';
+    document.getElementById('confirmName').textContent = fullName;
+    document.getElementById('cDate').textContent       = S.date;
+    document.getElementById('cCount').textContent      = S.bladeCount + (S.bladeCount===1?' blade':' blades');
+    document.getElementById('cTypes').textContent      = S.bladeTypes.length ? S.bladeTypes.join(', ') : '—';
+    const cMap = {text:'Text',email:'Text + Email',none:'Check back'};
+      // Show email in confirm if provided
+      const cEmailVal = document.getElementById('cEmailVal');
+      if (cEmailVal) {
+        if (S.email && S.consent === 'email') {
+          cEmailVal.textContent = S.email;
+          cEmailVal.closest('.confirm-row')?.style && (cEmailVal.closest('.confirm-row').style.display = 'flex');
+        } else {
+          cEmailVal.closest('.confirm-row')?.style && (cEmailVal.closest('.confirm-row').style.display = 'none');
+        }
+      }
+    document.getElementById('cConsent').textContent    = cMap[S.consent];
+    document.getElementById('cColor').childNodes[0].textContent = S.cardColorName + ' ';
+  }
+
+  // ── PHONE VERIFY ──
+  function onPhoneBlur() {
+    // Verify overlay removed from auto-trigger — no longer fires on blur
+    // Phone value is preserved in S.phone via formatPhone()
+  }
+  function showPhoneEdit(show, val) {
+    const v = document.getElementById('phoneVerify');
+    const i = document.getElementById('phoneInput');
+    const d = document.getElementById('phoneVerifyVal');
+    if (!v || !i) return;
+    if (show && val) {
+      d.textContent = val;
+      v.style.display = 'flex';
+      i.style.display = 'none';
+      S.phone = val;
+    } else {
+      v.style.display = 'none';
+      i.style.display = 'block';
+    }
+  }
+  function editPhone() {
+    showPhoneEdit(false);
+    const i = document.getElementById('phoneInput');
+    if (i) { i.focus(); i.select(); }
+  }
+
+  // ── EMAIL VERIFY ──
+  function onEmailBlur() {
+    const inp = document.getElementById('emailInput');
+    const val = inp ? inp.value.trim() : '';
+    const parts = val.split('@');
+    const tld   = parts[1] ? parts[1].split('.').pop() : '';
+    if (val && parts.length === 2 && parts[0].length >= 1 && tld.length >= 2) {
+      showEmailEdit(true, val);
+    }
+  }
+  function showEmailEdit(show, val) {
+    const v = document.getElementById('emailVerify');
+    const i = document.getElementById('emailInput');
+    const d = document.getElementById('emailVerifyVal');
+    if (!v || !i) return;
+    if (show && val) {
+      d.textContent = val;
+      v.style.display = 'flex';
+      i.style.display = 'none';
+      S.email = val;
+    } else {
+      v.style.display = 'none';
+      i.style.display = 'block';
+    }
+  }
+  function editEmail() {
+    showEmailEdit(false);
+    const i = document.getElementById('emailInput');
+    if (i) { i.focus(); i.select(); }
+  }
+
+</script>
+</body>
+</html>
